@@ -9,10 +9,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.heroicrobot.dropbit.devices.pixelpusher.PixelPusher;
 import com.heroicrobot.dropbit.registry.DeviceRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class ArtNetMapping {
-
+  private static final Logger LOGGER = LoggerFactory.getLogger(ArtNetMapping.class.getName());
   public static final int CHANNELS_PER_UNIVERSE = 512;
 
   Map<ArtNetLocation, PixelPusherLocation> mapping;
@@ -48,7 +50,7 @@ public class ArtNetMapping {
 	  try {
 		return InetAddress.getByAddress(rawAddr);
 	  } catch (UnknownHostException e) {
-		e.printStackTrace();
+                LOGGER.error("UnknownHostException", e);
 		return null;
 	}
   }
@@ -58,14 +60,14 @@ public class ArtNetMapping {
     for (PixelPusher pusher : pushers) {
       int startingChannel = pusher.getArtnetChannel();
       int startingUniverse = pusher.getArtnetUniverse();
-      System.out.println("Mapping pusher at starting universe "
-          + startingUniverse + ", starting channel: " + startingChannel);
+      LOGGER.info("Mapping pusher at starting universe {}, starting channel: {}",
+            startingUniverse, startingChannel);
       if (startingChannel == 0 && startingUniverse == 0) {
-    	  System.out.println("Not mapping.  Set artnet_channel and artnet_universe to something other than 0.");
+    	  LOGGER.error("Not mapping.  Set artnet_channel and artnet_universe to something other than 0.");
           continue;
       }
       if (mappedPushers.contains(pusher)) {
-    	  System.out.println("Already mapped this pusher.");
+    	  LOGGER.info("Already mapped this pusher.");
       } else {
     	  mappedPushers.add(pusher);
       }
@@ -83,7 +85,7 @@ public class ArtNetMapping {
         // set current pixel's mapping
     	location = getSacnMulticast(currentUniverse);
     	if (pusher.getStrip(currentStrip).getRGBOW()) {
-       		System.out.println("ArtNet: RGBOW channels [" + currentUniverse + ", "
+       		LOGGER.info("ArtNet: RGBOW channels [" + currentUniverse + ", "
     				+ currentChannel + "," + (currentChannel + 1) + ","
     				+ (currentChannel + 2) + ","+ (currentChannel + 3) +","
     				+ (currentChannel + 4) + "] -> PixelPusher: [" + currentStrip
@@ -108,7 +110,7 @@ public class ArtNetMapping {
     			multicastAddresses.add(location);
    		
     	} else {
-    		System.out.println("ArtNet: RGB channels [" + currentUniverse + ", "
+    		LOGGER.info("ArtNet: RGB channels [" + currentUniverse + ", "
     				+ currentChannel + "," + (currentChannel + 1) + ","
     				+ (currentChannel + 2) + "] -> PixelPusher: [" + currentStrip
     				+ ", " + currentPixel + "] at multicast "+location);

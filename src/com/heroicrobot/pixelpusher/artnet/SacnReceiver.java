@@ -4,10 +4,12 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class SacnReceiver extends Thread {
-
+        private static final Logger LOGGER = LoggerFactory.getLogger(SacnReceiver.class.getName());
 
 	public static final int SOURCE_NAME_ADDR  = 44;
 
@@ -63,17 +65,17 @@ public class SacnReceiver extends Thread {
 		    try {
 				mcSocket = new MulticastSocket(SACN_PORT);
 			} catch (IOException e1) {
-				e1.printStackTrace();
+				LOGGER.error("IOException", e1);
 			}
 		    
 	 }
 	
 	 public void addGroup(InetAddress group) {
 		 try {
-			System.out.println("sACN: Joining multicast group "+group);
+			LOGGER.info("sACN: Joining multicast group {}", group);
 			mcSocket.joinGroup(group);
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.error("IOException", e);
 		}
 	 }
 	 
@@ -102,9 +104,8 @@ public class SacnReceiver extends Thread {
 		      }
 
 		    } catch (NullPointerException e) {
-		      // System.out.println("No pixel at universe " + universe +
-		      // " channel "
-		      // + channel);
+                        LOGGER.debug("No pixel at universe {} channel {}", 
+                              universe, channel);
 		    }
 		  }
 	
@@ -113,7 +114,7 @@ public class SacnReceiver extends Thread {
 		    if (buf.length > ACN_IDENTIFIER_SIZE) {
 		    for (int i = 0; i < ACN_IDENTIFIER_SIZE; i++) {
 		    		if (ACN_IDENTIFIER[i] != buf[i + 4]) { // packetId
-		    	  		System.out.println("sACN:  Got a packet on the sACN port, but ID was wrong.");
+		    	  		LOGGER.info("sACN:  Got a packet on the sACN port, but ID was wrong.");
 		    	  		return;
 		      		}
 		    	}
@@ -121,11 +122,11 @@ public class SacnReceiver extends Thread {
 		    // If we get here, it looks like there's a packet to handle.
 		    
 		      if (!this.seenPacket) {
-		        System.out.println("sACN:  Got an sACN packet!");
+		        LOGGER.info("sACN:  Got an sACN packet!");
 		        this.seenPacket = true;
 		      }
 		      int universe = ((buf[114] & 0xff) | ((buf[113] & 0xff) << 8));
-		      //System.out.println("Universe = "+universe);
+		      LOGGER.debug("sACN:  Universe = {}", universe);
 		      for (int i = 0; i < 512; i++) {
 		        // the channel data is in buf[i+126];
 		        update_channel(universe, i + 1, buf[i + 126]);
@@ -146,7 +147,7 @@ public class SacnReceiver extends Thread {
 	        if (packetno % 100 == 0)
 	          packetno++;
 	      } catch (IOException e) {
-	        e.printStackTrace();
+	        LOGGER.error("IOException", e);
 	      }
 	      
 	    }

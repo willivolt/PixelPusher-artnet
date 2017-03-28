@@ -8,8 +8,12 @@ import java.util.Observer;
 
 import com.heroicrobot.dropbit.devices.pixelpusher.PixelPusher;
 import com.heroicrobot.dropbit.registry.DeviceRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class PixelPusherObserver implements Observer {
+  private static final Logger LOGGER = LoggerFactory.getLogger(PixelPusherObserver.class.getName());
+  
   public boolean hasStrips = false;
   public ArtNetMapping mapping = new ArtNetMapping();
   public HashMap<String,PixelPusher> knownPushers = new HashMap<String,PixelPusher>();
@@ -41,10 +45,10 @@ class PixelPusherObserver implements Observer {
     		if (hasSignificantChange((PixelPusher)updatedDevice)) {
     			generateMapping((DeviceRegistry) registry);
     			
-        		System.out.println("Device change: " + updatedDevice);
+        		LOGGER.info("Device change: {}", updatedDevice);
     		}
     	} else {
-    		System.out.println("Registry:  updated device was not a PixelPusher!");
+    		LOGGER.info("Registry:  updated device was not a PixelPusher!");
     	}
   	}
     this.hasStrips = true;

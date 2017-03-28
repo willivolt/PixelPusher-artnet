@@ -1,9 +1,12 @@
 package com.heroicrobot.pixelpusher.artnet;
 
 import com.heroicrobot.dropbit.registry.DeviceRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ArtNetBridge {
-
+  private static final Logger LOGGER = LoggerFactory.getLogger(ArtNetBridge.class.getName());
+ 
   public static ColourOrdering order;
   public static boolean packing=true;
 	
@@ -19,10 +22,10 @@ public class ArtNetBridge {
   public static void main(String[] args) {
 	  // parse commandline argument-  colour ordering.
 	if (args.length > 0) {
-		System.out.println("Setting colour ordering to "+args[0]);
+                LOGGER.info("Setting colour ordering to {}", args[0]);
 		order = new ColourOrdering(args[0]);
 	} else {
-		System.out.println("Using default colour ordering.");
+                LOGGER.info("Using default colour ordering {}", "RGB");
 		order = new ColourOrdering(ColourOrdering.RGB);
 	}
 	
@@ -38,19 +41,19 @@ public class ArtNetBridge {
 		}
 	}
 	
-	System.out.println("Red components at channel + "+ order.getOffset(ColourOrdering.RED));
-	System.out.println("Green components at channel + "+ order.getOffset(ColourOrdering.GREEN));
-	System.out.println("Blue components at channel + "+ order.getOffset(ColourOrdering.BLUE));
+        LOGGER.info("Red components at channel + {}", order.getOffset(ColourOrdering.RED));
+	LOGGER.info("Green components at channel + {}", order.getOffset(ColourOrdering.GREEN));
+	LOGGER.info("Blue components at channel + {}", order.getOffset(ColourOrdering.BLUE));
 	
 	if (packing) {
-		System.out.println("Universe packing mode pack: universes will be filled");
+		LOGGER.info("Universe packing mode pack: universes will be filled");
 	} else {
-		System.out.println("Universe packing mode nopack: universes will be left part-filled");
+		LOGGER.info("Universe packing mode nopack: universes will be left part-filled");
 	}
 	if (debug) {
-		System.out.println("Debug mode: a message will be printed every 100 Art-Net packets.");
+		LOGGER.info("Debug mode: a message will be printed every 100 Art-Net packets.");
 	} else {
-		System.out.println("Debug mode disabled: no message will be printed for Art-Net packets.");
+		LOGGER.info("Debug mode disabled: no message will be printed for Art-Net packets.");
 	}
 	  
     observer = new PixelPusherObserver();

@@ -16,7 +16,8 @@ import org.slf4j.LoggerFactory;
 
 public class ArtNetReceiver extends Thread {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ArtNetReceiver.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(
+            ArtNetReceiver.class.getName());
 
     public static final int ARTNET_PORT = 6454;
     public static final byte[] header = {0x41, 0x72, 0x74, 0x2d, 0x4e, 0x65,
@@ -305,7 +306,8 @@ public class ArtNetReceiver extends Thread {
                 if (networkInterface.isLoopback()) {
                     continue;    // Don't want to broadcast to the loopback interface
                 }
-                for (InterfaceAddress interfaceAddress : networkInterface.getInterfaceAddresses()) {
+                for (InterfaceAddress interfaceAddress : networkInterface.
+                        getInterfaceAddresses()) {
                     broadcast = interfaceAddress.getBroadcast();
                     if (broadcast == null) {
                         continue;
@@ -314,7 +316,8 @@ public class ArtNetReceiver extends Thread {
                     try {
                         DatagramSocket ds = new DatagramSocket();
                         ds.setBroadcast(true);
-                        DatagramPacket dp = new DatagramPacket(artpoll_buf, artpoll_buf.length, broadcast, 0x1936);
+                        DatagramPacket dp = new DatagramPacket(artpoll_buf,
+                                artpoll_buf.length, broadcast, 0x1936);
                         ds.send(dp);
                         ds.close();
                     } catch (Exception e) {
@@ -355,7 +358,8 @@ public class ArtNetReceiver extends Thread {
                 return;
             }
             if (packet.getLength() < length_bytes) {
-                LOGGER.error("Expected Art-Net datagram length {} but received {}, which is too short.",
+                LOGGER.error(
+                        "Expected Art-Net datagram length {} but received {}, which is too short.",
                         length_bytes, packet.getLength());
                 return;
             }
@@ -367,7 +371,8 @@ public class ArtNetReceiver extends Thread {
         } else {
             if (buf[8] == 0x00 && buf[9] == 0x20) {
                 if (observer.mapping.getMappedPushers().size() > 0) {
-                    for (PixelPusher pusher : observer.mapping.getMappedPushers()) {
+                    for (PixelPusher pusher : observer.mapping.
+                            getMappedPushers()) {
                         updateArtPollBuf(pusher);
                         sendArtPollReply(buf);
                     }
@@ -378,7 +383,8 @@ public class ArtNetReceiver extends Thread {
             }
             if (buf[8] == 0x00 && buf[9] == 0x51) {
                 // Opcode 0x5100 is Non-Zero Start DMX data.
-                LOGGER.error("Non-zero start data received, but is not supported.");
+                LOGGER.error(
+                        "Non-zero start data received, but is not supported.");
             }
             return;
         }
@@ -394,9 +400,12 @@ public class ArtNetReceiver extends Thread {
             socket.setReuseAddress(true);
             socket.setBroadcast(true);
 
-            socket.bind(new InetSocketAddress(InetAddress.getByName("0.0.0.0"), ARTNET_PORT));
-            LOGGER.info("Listening for Art-Net messages on {} port {}, broadcast={}",
-                    socket.getLocalAddress(), socket.getLocalPort(), socket.getBroadcast());
+            socket.bind(new InetSocketAddress(InetAddress.getByName("0.0.0.0"),
+                    ARTNET_PORT));
+            LOGGER.info(
+                    "Listening for Art-Net messages on {} port {}, broadcast={}",
+                    socket.getLocalAddress(), socket.getLocalPort(), socket.
+                    getBroadcast());
         } catch (IOException e) {
             LOGGER.error("Fatal error", e);
             return;
